@@ -1,3 +1,3 @@
-# Songs
+# Read a Studio One song file
 
-A generic song class for the song data extraction modules.
+A module for extracting data from Presonus Studio One song packages.
