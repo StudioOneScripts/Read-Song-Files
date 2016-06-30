@@ -332,7 +332,7 @@ skipclip:
 
 
         '*****************************************************************
-        ' OPTIONALY PRINT A NICELY FORMATTED OVERVIEW OF THE SONG DETAILS
+        '   OPTIONALLY PRINT A FORMATTED OVERVIEW OF THE SONG DETAILS
         '*****************************************************************
 
         Exit Sub  ' uncomment to always get test printout of the entire song
