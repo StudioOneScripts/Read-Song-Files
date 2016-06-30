@@ -6,10 +6,6 @@
 
 '    This uses Ionic.zip dll to unzip the file  https://dotnetzip.codeplex.com/
 
-'    Rather than distribute the dll, you can resource it in your project and make 
-'    the application always copy it from the folder where the application is launched 
-'    if it's not already there.  Put the following code block on your Form_Load sub
-
        '********************************************************
        ' Form_Load code to always copy the zip dll dependency.
        ' Make sure you copy the dll to your project resources.
