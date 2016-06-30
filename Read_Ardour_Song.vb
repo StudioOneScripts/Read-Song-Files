@@ -56,7 +56,6 @@ Module Read_Ardour_Song
         curSong.Name = Replace(f.SafeFileName, ".ardour", "")
 
         ' create a new shared UID for Master and all track connections
-        curSong.MasterBusID = curSong.createUID
 
         curSong.AudioFilePath = Replace(f.FileName, "\" & f.SafeFileName, "")
 
@@ -109,11 +108,7 @@ Module Read_Ardour_Song
             pClip.XMLClipID = SourceNodes(s).Attributes("id").Value
             PoolFiles.Add(pClip)
         Next
-        '  Stop
-        ' /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        curSong.ChildTracks = New List(Of Track)
-
+   
         '*************************************************************
         '    Loop through all tracks and clips in the song 
         '    song markers property, which is a string array
@@ -121,7 +116,9 @@ Module Read_Ardour_Song
 
         Dim SongList As New ListBox
         Dim Row As Integer = 0
-
+        
+        curSong.ChildTracks = New List(Of Track)
+       
         '*************************************************************
         '      START READING THE TRACKS AND CLIPS IN A FOR LOOP   
         '************************************************************
