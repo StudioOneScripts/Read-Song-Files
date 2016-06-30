@@ -6,21 +6,20 @@
 
 '    This uses Ionic.zip dll to unzip the file  https://dotnetzip.codeplex.com/
 
-       '********************************************************
-       ' Form_Load code to always copy the zip dll dependency.
-       ' Make sure you copy the dll to your project resources.
-       '********************************************************
-       
-       ' Get the path the exe was launched from
+       '//////  CODE TO ALWAYS COPY THE DLL RESOURCE IF NOT EXISTING ///////////////////////
+       ' Use this code Form_Load and make sure you put the dll to your project resources.
+      
+       '' Get the path / folder that the application was launched from
        ' Dim strPath As String = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase)
 
-        ' if the dll doesn't exist there, copy it from resources
+       '' if the zip dll doesn't already exist there, copy it there from resources 
        ' Dim zipdll = Replace(strPath, "file:\", "") & "\Ionic.Zip.dll"
-        'strPath = Replace(strPath, "file:\", "")
+       ' strPath = Replace(strPath, "file:\", "")
        ' If My.Computer.FileSystem.FileExists(zipdll) = False Then
        '     File.WriteAllBytes(strPath & "\Ionic.Zip.dll", My.Resources.Ionic_Zip)
        ' End If
-
+       '///////////////////////////////////////////////////////////////////////////////////
+       
 '**************************************************************************************
 
 Imports System.Xml
@@ -28,10 +27,10 @@ Imports Ionic.Zip
 
 Module Read_Studio_One_Song
 
-    ' temp path for the Studio One song file extraction
+    ' temp path folder for the Studio One song file extraction
     Dim TempPath = My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\SongTemp"
     
-    ' variable sor the class objects and clip counter
+    ' variable for the class objects and total clips counter
     Dim curSong As Song, curTrack As Track, TotalClips As Integer
 
     Public Sub Read_Studio_One_Song_File()
