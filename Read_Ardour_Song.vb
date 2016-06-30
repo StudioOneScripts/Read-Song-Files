@@ -1,8 +1,9 @@
 ' this module needs a bit of cleaning up and refactoring
+' and more code commenting.  colors also not working yet
 
 Imports System.Xml
 
-Module Test_Read_Ardour_Song
+Module Read_Ardour_Song
 
     ' var used to increment numbers when cross checking track names
     ' with the Song.crossCheckTrackNames() Method
