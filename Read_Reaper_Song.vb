@@ -96,11 +96,11 @@ Module Read_Reaper_Song
                 Dim data = Split(Trim(SongFile(I)), " ")
                 curTrack.Volume = data(1)
 
-                '****************************************************
-                '  Reaper's pan ranges from  Left -1, Center 0, Right 
+                '********************************************************
+                '  Reaper's pan ranges from  Left -1, Center 0, Right 1
                 '  keep that in mind when converting pan values to
                 '  other products where the ranges may be different
-                '****************************************************
+                '********************************************************
                 curTrack.Pan = data(2)
             End If
 
