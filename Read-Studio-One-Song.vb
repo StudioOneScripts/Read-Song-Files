@@ -6,7 +6,7 @@
 
      ' This uses Ionic.zip dll to unzip the file  https://dotnetzip.codeplex.com/
 
-       '**************  CODE TO ALWAYS COPY THE ZIP DLL RESOURCE IF NOT EXISTING  **************
+       '/// **************  CODE TO ALWAYS COPY THE ZIP DLL RESOURCE IF NOT EXISTING  ************///
        ' Use this code in Form_Load and make sure you put the dll in your project resources.
       
        '' Get the path / folder that the application was launched from
@@ -18,7 +18,7 @@
        ' If My.Computer.FileSystem.FileExists(zipdll) = False Then
        '     File.WriteAllBytes(strPath & "\Ionic.Zip.dll", My.Resources.Ionic_Zip)
        ' End If
-       '****************************************************************************************
+       '/// **************************************************************************************///
        
     '**************************************************************************************
 
