@@ -114,7 +114,6 @@ Module Read_Studio_One_Song
         curSong.Denominator = metaXML.SelectSingleNode("/MetaInformation/Attribute[@id=" & Q & "Media:TimeSignatureDenominator" & Q & "]").Attributes("value").Value
         curSong.TimeSig = curSong.Numerator & "/" & curSong.Denominator
 
-
         ' get the song notes 
         Try
             curSong.Notes = My.Computer.FileSystem.ReadAllText(TempPath & "\notes.txt")
