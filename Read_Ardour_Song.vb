@@ -1,14 +1,20 @@
-    Module Read_Ardour_File
-    
-   
+' this module needs a bit of cleaning up and refactoring
+
+Imports System.Xml
+
+Module Test_Read_Ardour_Song
 
     ' var used to increment numbers when cross checking track names
     ' with the Song.crossCheckTrackNames() Method
     'Public IncrementTrackNames As Integer = 0
     'Public IncrementAudioChNames As Integer = 100
 
-    Public Sub Read_Ardour_Song_Data()
-    Dim PoolFiles As New List(Of Clip)
+    Public Sub Read_Ardour_Song()
+
+        Dim TrackNodes As XmlNodeList, ClipNodes As XmlNodeList
+        Dim PoolFiles As New List(Of Clip), Tracks As New List(Of Track), Clips As New List(Of Clip)
+        Dim AllClips As New List(Of Clip)
+        loadedSong = New Song
 
         '//////////////////////////////////////////////////////////////////
         '////    READ THE XML FROM A *.TRACKTIONEDIT TRACKTION 7 XML   ////    
@@ -29,12 +35,12 @@
         If My.Computer.FileSystem.FileExists(f.FileName) = False Then Exit Sub
 
         ' get the short file name for later
-        ShortFileName = Replace(f.SafeFileName, ".ardour", "")
+        Dim ShortFileName = Replace(f.SafeFileName, ".ardour", "")
 
         '*****************************************************************
-        ' Load song file into xml document 
+        '          LOAD SONG FILE INTO AN XML DOCUMENT
         '*****************************************************************
-        
+
         Dim reader As XmlTextReader = New XmlTextReader(f.FileName)
         Dim songText = My.Computer.FileSystem.ReadAllText(f.FileName)
         Dim songXML As New XmlDocument
@@ -46,9 +52,9 @@
         PoolFiles.Clear()
 
         '*************************************************************
-        '    New song instance from Song Class 
+        '                 INIT SONG CLASS OBJECT
         '*************************************************************
-        
+
         Dim curSong As New Song
         curSong.ChildTracks = New List(Of Track)
         curSong.Name = Replace(f.SafeFileName, ".ardour", "")
@@ -65,7 +71,7 @@
         '   Set the Song Class Tempo Sample Rate & Time Sig Properties
         Dim curNode = songXML.SelectSingleNode("/Session/TempoMap/Tempo")
         curSong.Tempo = curNode.Attributes("beats-per-minute").Value
-        
+
         ' Ardour uses sample for placement so this will help the conversion
         Dim BeatPerSecond = (curSong.Tempo / 60)
 
@@ -89,7 +95,7 @@
 
         '//////////////////////////////////////////////////////////////////////////////////////////////////////
         PoolFiles.Clear()
-        
+
         '  create unique UID's for the pool clips
         For s = 0 To SourceNodes.Count - 1
             ' create a new clip
@@ -120,7 +126,7 @@
 
         Dim SongList As New ListBox
         Dim Row As Integer = 0
-        
+
         '*************************************************************
         '      START READING THE TRACKS AND CLIPS IN A FOR LOOP   
         '************************************************************
@@ -174,7 +180,7 @@
             'curNode = songXML.SelectSingleNode("/Session/Routes/Route[@id=" & refID & "]/PresentationInfo")
             'Dim clr = Hex(curNode.Attributes.ItemOf("color").Value)
             'curTrack.Color = clr
-            
+
             '***************************************************
             '      READ THE CLIP BENEATH THE <PLAYLIST> TAG  
             '***************************************************
@@ -183,7 +189,7 @@
 
                 ' New clip object instance from Clip Class
                 Dim curClip As New Clip
-                
+
                 '  Only extract from <Region> nodes In Ardour Start = Offset / Position = Start
                 Select Case ClipNodes(C).Name
                     Case = "Region"
@@ -223,14 +229,14 @@
                         Next
 
                 End Select
-                
+
                 '  Add the current Clip to the List(of Clip) array
                 Clips.Add(curClip)
 
                 ' push to track array
                 curTrack.ChildClips.Add(curClip)
             Next
-            
+
             ' Add this collection of clips to the AllClips List() before cycle
             For P = 0 To Clips.Count - 1
                 AllClips.Add(Clips(P))
@@ -248,9 +254,9 @@
 
         '  Method:  validate and format track names
         For Each Track In Tracks
-            Track.Name = curSong.FormatTrackNames(Track.Name)
+            Track.Name = curSong.FormatTrackName(Track.Name)
         Next
-        
+
         '****************************************************************
         '                   GET THE SONG MARKERS 
         '****************************************************************
@@ -261,8 +267,6 @@
             Try
                 If curNode.Attributes("flags").Value = "IsMark" Then
                     curSong.Markers.Add((curNode.Attributes("start").Value / curSong.SampleRate) * BeatPerSecond & "|" & curNode.Attributes("name").Value)
-                    'loadedSong.SongMarkers.Add(curNode.Attributes("name").Value & "|" & (curNode.Attributes("start").Value / curSong.SampleRate) * BeatPerSecond)
-                    ' Stop
                     curNode = curNode.NextSibling
                 End If
             Catch
@@ -270,15 +274,18 @@
             End Try
 
         Loop
-        
-        loadedSong.SongMarkers = curSong.Markers
+
+        loadedSong.Markers = New List(Of String)
+        loadedSong.Markers = curSong.Markers
+
         loadedSong = curSong
-        
+
         '*****************************************************
         '        OPTIONALLY PRINT FORMATTED RESULTS
         '*****************************************************
-                Exit Sub  ' optionally print data result
-                loadedSong.PrintData()
-        
+        'Exit Sub  ' optionally print data result
+        loadedSong.PrintSongData()
+
     End Sub
-    End Module
+End Module
+
