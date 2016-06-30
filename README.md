@@ -1,3 +1,3 @@
-# Read Studio One *.song Files
+# Read Song Files
 
-A module for extracting data from Presonus Studio One *.song packages which are a collection of zipped up xml files.
+Modules for reading data from certain audio workstation song files
