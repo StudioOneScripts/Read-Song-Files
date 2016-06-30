@@ -1,10 +1,10 @@
 
-'*************************************************************************************
-'    This module will read a Presonus Studio One *.song file and extract relevant
-'    details including fader, pand and clip settings.  It may be useful if you want 
-'    to convert a Studio One song to another populr audio workstation's song format.
+     '*************************************************************************************
+     ' This module will read a Presonus Studio One *.song file and extract relevant
+     ' details including fader, pand and clip settings.  It may be useful if you want 
+     ' to convert a Studio One song to another populr audio workstation's song format.
 
-'    This uses Ionic.zip dll to unzip the file  https://dotnetzip.codeplex.com/
+     ' This uses Ionic.zip dll to unzip the file  https://dotnetzip.codeplex.com/
 
        '**************  CODE TO ALWAYS COPY THE ZIP DLL RESOURCE IF NOT EXISTING  **************
        ' Use this code in Form_Load and make sure you put the dll in your project resources.
@@ -20,7 +20,7 @@
        ' End If
        '****************************************************************************************
        
-'**************************************************************************************
+    '**************************************************************************************
 
 Imports System.Xml
 Imports Ionic.Zip
