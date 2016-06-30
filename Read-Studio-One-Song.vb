@@ -1,3 +1,12 @@
+
+'**********************************************************************************
+'    This module will read a Presonus Studio One *.song file and extract relevant
+'    details including clip settings.  It may be useful if you want to convert a
+'    Studio One song to another populr audio workstation's song format.
+
+'    This uses Ionic.zip dll to unzip the file  https://dotnetzip.codeplex.com/
+'**********************************************************************************
+
 Imports System.Xml
 Imports Ionic.Zip
 
@@ -11,12 +20,8 @@ Module Read_Studio_One_Song
     Public Sub Read_Studio_One_Song_File()
 
         '******************************************************************************************************************
-        '//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        '///////////////////////////   OPEN AND UNZIP A STUDIO ONE SONG FILE TO GET THE DATA   ////////////////////////////
-        '//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        '                           OPEN AND UNZIP A STUDIO ONE SONG FILE TO GET THE DATA  
         '******************************************************************************************************************
-
-        ' uses Ionic.zip dll to unzip the file  https://dotnetzip.codeplex.com/
 
         ' open a file dialog to choose the file
         Dim f As New OpenFileDialog
