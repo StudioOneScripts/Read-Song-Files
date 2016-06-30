@@ -20,7 +20,6 @@ Module Read_Reaper_Song
 
         ' read the Reaper file into a string array
         Dim SongFile = IO.File.ReadAllLines(f.FileName)
-        'For i = 0 To SongFile.Count - 1
         
         ' init a new song class object
         curSong = New Song
