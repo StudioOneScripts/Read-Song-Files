@@ -277,7 +277,7 @@ Module Test_Read_Ardour_Song
         '*****************************************************
         '        OPTIONALLY PRINT FORMATTED RESULTS
         '*****************************************************
-        'Exit Sub  ' optionally print data result
+        Exit Sub  ' optionally print data result
         loadedSong.PrintSongData()
 
     End Sub
