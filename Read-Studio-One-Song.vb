@@ -71,6 +71,9 @@ Module Read_Studio_One_Song
 
         ' init a song class object
         Dim curSong As New Song
+        
+        ' set the song name in the class object
+        curSong.Name = Replace(f.SafeFileName, ".song", "")
 
         ' load the mediapool.xml file  (needed for clip filenames)
         Dim mediaPool = My.Computer.FileSystem.ReadAllText(TempPath & "\Song\mediapool.xml")
@@ -81,8 +84,6 @@ Module Read_Studio_One_Song
         Dim audioMixer = My.Computer.FileSystem.ReadAllText(TempPath & "\Devices\audiomixer.xml")
         Dim audioMixerXML As New XmlDocument
         audioMixerXML.LoadXml(Replace(audioMixer, "x:", ""))
-
-        curSong.Name = Replace(f.SafeFileName, ".song", "")
 
         ' load the metainfo.xml file
         Dim metaInfo = My.Computer.FileSystem.ReadAllText(TempPath & "\metainfo.xml")
