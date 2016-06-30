@@ -134,7 +134,7 @@ Module Read_Studio_One_Song
         Dim songXML As New XmlDocument
         songXML.LoadXml(songInfo)
 
-        ' get the song markers from song.xml
+        ' get the song markers from song.xml file
         curSong.Markers = New List(Of String)
         Dim Markers = songXML.SelectSingleNode("/Song/Attributes/List/MarkerTrack").ChildNodes
 
@@ -227,6 +227,7 @@ Module Read_Studio_One_Song
                         ' if the currrent clip doesn't have both a name and
                         ' a clipID attribute, something is wrong, skip it
                         '******************************************************
+                        
                         Try
                             curClip.Name = Eventlist(aEvent).Attributes("name").Value
 
@@ -298,6 +299,7 @@ Module Read_Studio_One_Song
                         '*************************************************************************
                         '        FIND AND FORMAT THE FILENAME FOR THE CURRENT AUDIO CLIP
                         '*************************************************************************
+                        
                         ' get the filename by cross-referencing the mediapool.xml file UID
                         Dim poolID = mediaPoolXML.SelectSingleNode("/MediaPool/Attributes/MediaFolder/AudioClip[@mediaID=" & Q & curClip.ClipID & Q & "]/Url").Attributes("url").FirstChild.Value
 
