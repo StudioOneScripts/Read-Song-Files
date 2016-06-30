@@ -1,5 +1,14 @@
-Public Sub Read_Studio_One_Song()
+Imports System.Xml
+Imports Ionic.Zip
 
+Module Read_Studio_One_Song
+
+    ' temp path for the Studio One song file extraction
+    Dim TempPath = My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\SongTemp"
+
+    Dim curSong As Song, curTrack As Track, TotalClips As Integer
+
+    Public Sub Read_Studio_One_Song_File()
 
         '******************************************************************************************************************
         '//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,32 +18,29 @@ Public Sub Read_Studio_One_Song()
 
         ' uses Ionic.zip dll to unzip the file  https://dotnetzip.codeplex.com/
 
+        ' open a file dialog to choose the file
         Dim f As New OpenFileDialog
-        f.InitialDirectory = StudioOneFolder
+        f.InitialDirectory = ""
         f.Filter = "Studio One Song (*.song)|*.song"
         f.Title = "Open a Studio One Song ..."
         f.ShowDialog()
+
+        ' if user cancels, exit
         If My.Computer.FileSystem.FileExists(f.FileName) = False Then Exit Sub
 
-        ' a generic identifier var 
-        DAW = "Studio One"
-
-        Form1.lblExportType.Text = ""
-
-        ' remove temp folder and create a new one
+        ' remove temp folder from any previous operation and create a new one
         Try
             My.Computer.FileSystem.DeleteDirectory(TempPath, FileIO.DeleteDirectoryOption.DeleteAllContents)
-        Catch ex As Exception
-            ' MsgBox("remove temp dir: " & ex.Message)
+        Catch
+            ' silent catch
         End Try
 
+        ' create a new temp directory
         My.Computer.FileSystem.CreateDirectory(TempPath)
 
 
         '******************************************************************************************************************
-        '//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        '///////////////////////////   EXTRACT THE FILES BELOW FROM THE STUDIO ONE SONG FILE   ////////////////////////////
-        '//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        '                            EXTRACT THE FILES BELOW FROM THE STUDIO ONE SONG FILE PACKAGE   
         '******************************************************************************************************************
         Try
             Using zip As ZipFile = ZipFile.Read(f.FileName)
@@ -47,16 +53,18 @@ Public Sub Read_Studio_One_Song()
                 Next
             End Using
         Catch ex1 As Exception
-            MsgBox("zip file exception:    {0}", ex1.ToString)
+            MsgBox("Zip extraction error." & " " & vbNewLine & ex1.ToString, vbOKOnly + vbInformation, "Unzip Song Error")
+
+            ' no point in proceeding if you can't open the song package
+            Exit Sub
         End Try
 
         '******************************************************************************************************************
-        '//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        '///////////////////////////   INSTANCE A NEW SONG CLASS AND PARSE THE METAINFO FILE   ////////////////////////////
-        '//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        '                             INSTANCE A NEW SONG CLASS AND PARSE THE METAINFO.XML FILE    
         '******************************************************************************************************************
 
-        Dim curSong As New Song, TotalClips As Integer
+        ' init a song class object
+        Dim curSong As New Song
 
         ' load the mediapool.xml file  (needed for clip filenames)
         Dim mediaPool = My.Computer.FileSystem.ReadAllText(TempPath & "\Song\mediapool.xml")
@@ -93,11 +101,8 @@ Public Sub Read_Studio_One_Song()
             curSong.Notes = " "
         End Try
 
-
         '******************************************************************************************************************
-        '//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        '//////////////////   GET EVERYTHING ELSE FROM THE SONG.XML FILE:  MARKERS, SONGS AND CLIPS   /////////////////////
-        '//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        '                    GET SOME OTHER THINGS FROM THE SONG.XML FILE:  MARKERS, SONGS AND CLIPS   
         '******************************************************************************************************************
 
         ' load the song.xml into an XML document  (also replacing "x:" which is formatting VS has issue with
@@ -106,18 +111,16 @@ Public Sub Read_Studio_One_Song()
         songXML.LoadXml(songInfo)
 
         ' get the song markers, skip the first two (Start and End)
-        curSong.SongMarkers = New List(Of String)
+        curSong.Markers = New List(Of String)
         Dim Markers = songXML.SelectSingleNode("/Song/Attributes/List/MarkerTrack").ChildNodes
 
         ' loop through the array and add the markers to the song's property array
         For I = 2 To Markers.Count - 1
-            curSong.SongMarkers.Add(Markers(I).Attributes("start").Value & "|" & Markers(I).Attributes("name").Value)
+            curSong.Markers.Add(Markers(I).Attributes("start").Value & "|" & Markers(I).Attributes("name").Value)
         Next
 
         '******************************************************************************************************************
-        '//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        '////////////////////////////  READ ALL OF THE TRACKS AND CLIPS FROM THE SONG FILE   /////////////////////////
-        '//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        '                           READ ALL OF THE TRACKS AND CLIPS FROM THE SONG FILE   
         '******************************************************************************************************************
 
         ' this node list is a collection of all of the matching nodes below, audio tracks
@@ -128,13 +131,22 @@ Public Sub Read_Studio_One_Song()
 
         ' toop through the tracklist node list and get each track
         For i = 0 To TrackList.Count - 1
-            Dim curTrack As New Track
+
+            ' init a new Track class object
+            curTrack = New Track
+
+            ' init the object's list of clip array
             curTrack.ChildClips = New List(Of Clip)
-            curTrack.Name = TrackList(i).Attributes("name").Value
 
+            ' set the track name with the FormatTrackName() method
+            ' to check for empty track names and other things
+            curTrack.Name = curSong.FormatTrackName(TrackList(i).Attributes("name").Value)
+            curTrack.Color = TrackList(i).Attributes("color").Value
 
+            ' *********************************************************
             ' get the volume and pan for the curren track by cross
             ' referencing the GUID of the track with the audiomixer.xml
+            '***********************************************************
 
             ' get the channel ID
             curTrack.TrackID = TrackList(i).FirstChild.NextSibling.Attributes("uid").Value
@@ -162,16 +174,33 @@ Public Sub Read_Studio_One_Song()
                 curTrack.Mute = "0"
             End Try
 
+            '**************************************************************************
+            '           READ ALL OF THE CLIPS ON THE CURRENT TRACK
+            '**************************************************************************
+
             ' loop through all of the child nodes beneath this
             ' track and get all of the clips on this track
             Dim ChildList As XmlNodeList = TrackList(i).ChildNodes
             For c = 0 To ChildList.Count - 1
                 If ChildList(c).Name = "List" Then
+
                     Dim Eventlist As XmlNodeList = ChildList(c).ChildNodes
 
+                    '*************************  CLIPS *****************************
+                    ' <AudioEvent> tags.  The Try/Catch blocks are to ensure that
+                    ' every attribute we're looking for exists.  If not, create it
+                    ' some attributes only get created when the user changes them
+                    '**************************************************************
+
                     For aEvent = 0 To Eventlist.Count - 1
+
+                        ' create a new Clip class object
                         Dim curClip As New Clip
-                        curClip.ParentTrack = curTrack.TrackID
+
+                        '******************************************************
+                        ' if the currrent clip doesn't have both a name and
+                        ' a clipID attribute, something is wrong, skip it
+                        '******************************************************
                         Try
                             curClip.Name = Eventlist(aEvent).Attributes("name").Value
 
@@ -179,6 +208,14 @@ Public Sub Read_Studio_One_Song()
                         Catch
                             GoTo skipclip
                         End Try
+
+                        ' assign the current track UID to the clip for reference
+                        curClip.ParentTrack = curTrack.TrackID
+                        curClip.Length = Eventlist(aEvent).Attributes("length").Value
+                        curClip.Speed = Eventlist(aEvent).Attributes("speed").Value
+                        curClip.Pitch = Eventlist(aEvent).Attributes("transpose").Value
+                        curClip.Tune = Eventlist(aEvent).Attributes("tune").Value
+
                         Try
                             curClip.Mute = Eventlist(aEvent).Attributes("mute").Value
                         Catch
@@ -190,21 +227,34 @@ Public Sub Read_Studio_One_Song()
                             curClip.Start = "0"
                         End Try
 
-                        curClip.Length = Eventlist(aEvent).Attributes("length").Value
-
                         Try
                             curClip.Offset = Eventlist(aEvent).Attributes("offset").Value
                         Catch
                             curClip.Offset = "0"
                         End Try
 
-                        curClip.Speed = Eventlist(aEvent).Attributes("speed").Value
-                        curClip.Pitch = Eventlist(aEvent).Attributes("transpose").Value
-                        curClip.Tune = Eventlist(aEvent).Attributes("tune").Value
                         Try
                             curClip.Gain = Eventlist(aEvent).FirstChild.Attributes("level").Value
                         Catch
                             curClip.Gain = "1"
+                        End Try
+
+                        Try
+                            curClip.Pitch = Eventlist(aEvent).FirstChild.Attributes("transpose").Value
+                        Catch
+                            curClip.Pitch = "1"
+                        End Try
+
+                        Try
+                            curClip.Tune = Eventlist(aEvent).FirstChild.Attributes("tune").Value
+                        Catch
+                            curClip.Tune = "0"
+                        End Try
+
+                        Try
+                            curClip.Speed = Eventlist(aEvent).FirstChild.Attributes("speed").Value
+                        Catch
+                            curClip.Speed = "1"
                         End Try
                         Try
                             curClip.FadeIn = Eventlist(aEvent).FirstChild.Attributes("fadeIn.length").Value
@@ -217,27 +267,27 @@ Public Sub Read_Studio_One_Song()
                             curClip.FadeOut = "0"
                         End Try
 
-
-                        ' get the filename by referenceing the mediapool xml file
+                        '*************************************************************************
+                        '        FIND AND FORMAT THE FILENAME FOR THE CURRENT AUDIO CLIP
+                        '*************************************************************************
+                        ' get the filename by cross-referencing the mediapool.xml file UID
                         Dim poolID = mediaPoolXML.SelectSingleNode("/MediaPool/Attributes/MediaFolder/AudioClip[@mediaID=" & Q & curClip.ClipID & Q & "]/Url").Attributes("url").FirstChild.Value
 
-                        ' get the clip filename from the mediapool
+                        ' get the clip filename from the mediapool.xml reference and format it
                         curClip.FileName = Replace(Replace(poolID, "file:///", ""), "/", "\")
 
+                        '****************************************************************
                         ' the Track.ChildClips property is List(Of Clip) to hold all of
                         ' the clips for a given track in that property's array
+                        '****************************************************************
 
-
-
-                        '  Stop
-                        ' add the current clip to the Track property array
+                        ' add the current clip to the Track.ChildClips property array
                         curTrack.ChildClips.Add(curClip)
-
 
                         ' update the total clips var because the Clips object will 
                         ' go out of scope  at the end and we'll  need this value
                         TotalClips = TotalClips + 1
-                        ' Stop
+
                     Next
 skipclip:
                 End If
@@ -247,10 +297,20 @@ skipclip:
             curSong.ChildTracks.Add(curTrack)
         Next
 
-        ' copy the current Song over to the public LastSong Song
-        ' object before all of the data goes out of scope
-        ' we'll use that object's data for exporting
+        '*************************************************************
+        ' copy the current Song object over to the public loadedSong 
+        ' class object because curSong will go out of scope
+        ' ************************************************************
         loadedSong = curSong
-       
+
+
+        '*****************************************************************
+        ' OPTIONALY PRINT A NICELY FORMATTED OVERVIEW OF THE SONG DETAILS
+        '*****************************************************************
+
+        'Exit Sub  ' uncomment to get test print
+        loadedSong.PrintSongData()
 
     End Sub
+
+End Module
