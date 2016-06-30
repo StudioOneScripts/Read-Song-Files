@@ -6,7 +6,7 @@ Module Read_Reaper_Song
     Dim curSong As Song, curTrack As Track, curClip As Clip
     Dim isTrack As Boolean, isItem As Boolean, trackCompleted As Boolean
 
-    Public Sub Read_Reaper_Song_Info()
+    Public Sub Read_Reaper_Song()
 
         ' open a file dialog to open a Reaper file
         Dim f As New OpenFileDialog
