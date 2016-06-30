@@ -1,4 +1,3 @@
-```javascript
      '*************************************************************************************
      ' This module will read a Presonus Studio One *.song file and extract relevant
      ' details including fader, pand and clip settings.  It may be useful if you want 
@@ -343,4 +342,4 @@ skipclip:
     End Sub
 
 End Module
-```
+
