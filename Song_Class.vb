@@ -23,7 +23,8 @@ Public Class Song
     End Sub
     ' Song Methods
     Public Function FormatTrackName(name As String)
-
+    
+        ' strip any quote chars
         name = Replace(Trim(name), Chr(34), "")
 
         If Trim(name) = "" Then
