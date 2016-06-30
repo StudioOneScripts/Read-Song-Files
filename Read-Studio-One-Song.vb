@@ -251,24 +251,6 @@ skipclip:
         ' object before all of the data goes out of scope
         ' we'll use that object's data for exporting
         loadedSong = curSong
-        ' Stop
-        '******************************************************************************************************************
-        '//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        '/////////////////////////////////////////  UPDATE THE MAIN UI LABEL FIELDS  //////////////////////////////////////
-        '//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        '******************************************************************************************************************
-        Form1.lblSongName.Text = curSong.Name
-        Form1.lblSampleRate.Text = curSong.SampleRate
-        Form1.lblTempo.Text = curSong.Tempo
-        Form1.lblTimeSig.Text = curSong.TimeSig
-        Form1.lblTrackCount.Text = curSong.ChildTracks.Count
-        Form1.lblClipCount.Text = TotalClips
-        Form1.lblMarkerCount.Text = curSong.SongMarkers.Count
-        Try
-            Form1.txtNotes.Text = My.Computer.FileSystem.ReadAllText(TempPath & "\notes.txt")
-        Catch
-        End Try
-        Form1.lblImportType.Text = "In Format: " & DAW
-
+       
 
     End Sub
