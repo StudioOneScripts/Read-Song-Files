@@ -1,11 +1,31 @@
 
-'**********************************************************************************
+'*************************************************************************************
 '    This module will read a Presonus Studio One *.song file and extract relevant
-'    details including clip settings.  It may be useful if you want to convert a
-'    Studio One song to another populr audio workstation's song format.
+'    details including fader, pand and clip settings.  It may be useful if you want 
+'    to convert a Studio One song to another populr audio workstation's song format.
 
 '    This uses Ionic.zip dll to unzip the file  https://dotnetzip.codeplex.com/
-'**********************************************************************************
+
+'    Rather than distribute the dll, you can resource it in your project and make 
+'    the application always copy it from the folder where the application is launched 
+'    if it's not already there.  Put the following code block on your Form_Load sub
+
+       '********************************************************
+       ' Form_Load code to always copy the zip dll dependency.
+       ' Make sure you copy the dll to your project resources.
+       '********************************************************
+       
+       ' Get the path the exe was launched from
+       ' Dim strPath As String = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase)
+
+        ' if the dll doesn't exist there, copy it from resources
+       ' Dim zipdll = Replace(strPath, "file:\", "") & "\Ionic.Zip.dll"
+        'strPath = Replace(strPath, "file:\", "")
+       ' If My.Computer.FileSystem.FileExists(zipdll) = False Then
+       '     File.WriteAllBytes(strPath & "\Ionic.Zip.dll", My.Resources.Ionic_Zip)
+       ' End If
+
+'**************************************************************************************
 
 Imports System.Xml
 Imports Ionic.Zip
