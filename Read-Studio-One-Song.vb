@@ -14,7 +14,8 @@ Module Read_Studio_One_Song
 
     ' temp path for the Studio One song file extraction
     Dim TempPath = My.Computer.FileSystem.SpecialDirectories.MyDocuments & "\SongTemp"
-
+    
+    ' variable sor the class objects and clip counter
     Dim curSong As Song, curTrack As Track, TotalClips As Integer
 
     Public Sub Read_Studio_One_Song_File()
@@ -289,8 +290,8 @@ Module Read_Studio_One_Song
                         ' add the current clip to the Track.ChildClips property array
                         curTrack.ChildClips.Add(curClip)
 
-                        ' update the total clips var because the Clips object will 
-                        ' go out of scope  at the end and we'll  need this value
+                        ' update the totalclips var because the curClip object will 
+                        ' go out of scope on every loop cycle  and we'll need this value
                         TotalClips = TotalClips + 1
 
                     Next
