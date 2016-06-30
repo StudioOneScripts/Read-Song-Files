@@ -94,7 +94,7 @@ Module Read_Studio_One_Song
         Dim mediaPoolXML As New XmlDocument
         mediaPoolXML.LoadXml(Replace(mediaPool, "x:", ""))
 
-        ' load the audiomixer.xml file (needed for fader and pan
+        ' load the audiomixer.xml file (needed for fader and pan settings)
         Dim audioMixer = My.Computer.FileSystem.ReadAllText(TempPath & "\Devices\audiomixer.xml")
         Dim audioMixerXML As New XmlDocument
         audioMixerXML.LoadXml(Replace(audioMixer, "x:", ""))
@@ -118,7 +118,7 @@ Module Read_Studio_One_Song
         Try
             curSong.Notes = My.Computer.FileSystem.ReadAllText(TempPath & "\notes.txt")
         Catch
-            curSong.Notes = " "
+            curSong.Notes = ""
         End Try
 
         '******************************************************************************************************************
