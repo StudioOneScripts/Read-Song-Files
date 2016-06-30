@@ -90,7 +90,7 @@ Module Read_Studio_One_Song
         Dim metaXML As New XmlDocument
         metaXML.LoadXml(metaInfo)
 
-        'quote char
+        'quote char for the strings we'll build below
         Dim Q = Chr(34)
 
         ' get the tempo, sample rate and time sig from the metainfo.xml file
@@ -112,37 +112,40 @@ Module Read_Studio_One_Song
         '                    GET SOME OTHER THINGS FROM THE SONG.XML FILE:  MARKERS, SONGS AND CLIPS   
         '******************************************************************************************************************
 
-        ' load the song.xml into an XML document  (also replacing "x:" which is formatting VS has issue with
+        ' load the song.xml into an XML document while also replacing "x:" which is formatting VS has issue with
         Dim songInfo = Replace(My.Computer.FileSystem.ReadAllText(TempPath & "\Song\song.xml"), "x:", "")
+        
+        ' create a new xml document and load the file 
         Dim songXML As New XmlDocument
         songXML.LoadXml(songInfo)
 
-        ' get the song markers, skip the first two (Start and End)
+        ' get the song markers from song.xml
         curSong.Markers = New List(Of String)
         Dim Markers = songXML.SelectSingleNode("/Song/Attributes/List/MarkerTrack").ChildNodes
 
         ' loop through the array and add the markers to the song's property array
+        ' skip the first two markers which are always the default Start and End markers
         For I = 2 To Markers.Count - 1
             curSong.Markers.Add(Markers(I).Attributes("start").Value & "|" & Markers(I).Attributes("name").Value)
         Next
 
         '******************************************************************************************************************
-        '                           READ ALL OF THE TRACKS AND CLIPS FROM THE SONG FILE   
+        '                           READ IN ALL OF THE TRACKS AND CLIPS FROM THE SONG FILE   
         '******************************************************************************************************************
 
         ' this node list is a collection of all of the matching nodes below, audio tracks
         Dim TrackList As XmlNodeList = songXML.SelectNodes("/Song/Attributes/List/MediaTrack[@mediaType=" & Q & "Audio" & Q & "]")
 
-        ' song.ChildTracks is a List(Of Track) property for all of the tracks
+        ' song.ChildTracks is a List(Of Track) property for holding all of the tracks
         curSong.ChildTracks = New List(Of Track)
 
-        ' toop through the tracklist node list and get each track
+        ' loop through the tracklist node list and get each track's properties
         For i = 0 To TrackList.Count - 1
 
-            ' init a new Track class object
+            ' init a new Track class object on every cycle
             curTrack = New Track
 
-            ' init the object's list of clip array
+            ' init the new object's list of clip array on every cycle
             curTrack.ChildClips = New List(Of Clip)
 
             ' set the track name with the FormatTrackName() method
@@ -151,14 +154,14 @@ Module Read_Studio_One_Song
             curTrack.Color = TrackList(i).Attributes("color").Value
 
             ' *********************************************************
-            ' get the volume and pan for the curren track by cross
+            ' get the volume and pan for the current track by cross
             ' referencing the GUID of the track with the audiomixer.xml
             '***********************************************************
 
             ' get the channel ID
             curTrack.TrackID = TrackList(i).FirstChild.NextSibling.Attributes("uid").Value
 
-            ' get the reference track from the audiomixer.xml file
+            ' get the reference track from the audiomixer.xml file by matching the uid there
             Dim RefTrack As XmlNode = audioMixerXML.SelectSingleNode("/AudioMixer/Attributes/ChannelGroup/AudioTrackChannel/UID[@uid=" & Q & curTrack.TrackID & Q & "]").ParentNode
 
             Try
@@ -195,8 +198,9 @@ Module Read_Studio_One_Song
 
                     '*************************  CLIPS *****************************
                     ' <AudioEvent> tags.  The Try/Catch blocks are to ensure that
-                    ' every attribute we're looking for exists.  If not, create it
-                    ' some attributes only get created when the user changes them
+                    ' every attribute we're looking for exists.  If not, create it.
+                    ' Some attributes only get created when the user changes them
+                    ' and we may need them all to translate to other products.
                     '**************************************************************
 
                     For aEvent = 0 To Eventlist.Count - 1
@@ -218,6 +222,8 @@ Module Read_Studio_One_Song
 
                         ' assign the current track UID to the clip for reference
                         curClip.ParentTrack = curTrack.TrackID
+                        
+                        ' beging setting some of the more typical clip properties
                         curClip.Length = Eventlist(aEvent).Attributes("length").Value
                         curClip.Speed = Eventlist(aEvent).Attributes("speed").Value
                         curClip.Pitch = Eventlist(aEvent).Attributes("transpose").Value
@@ -294,7 +300,6 @@ Module Read_Studio_One_Song
                         ' update the totalclips var because the curClip object will 
                         ' go out of scope on every loop cycle  and we'll need this value
                         TotalClips = TotalClips + 1
-
                     Next
 skipclip:
                 End If
@@ -315,7 +320,7 @@ skipclip:
         ' OPTIONALY PRINT A NICELY FORMATTED OVERVIEW OF THE SONG DETAILS
         '*****************************************************************
 
-        'Exit Sub  ' uncomment to get test print
+        Exit Sub  ' uncomment to always get test printout of the entire song
         loadedSong.PrintSongData()
 
     End Sub
