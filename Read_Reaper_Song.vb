@@ -1,7 +1,7 @@
 Module Read_Reaper_Song
 
     ' Seqentially read through a REAPER song file line by line and extract the song
-    ' and markers and the tracks and clips and all relevant properties and  settings. 
+    ' and markers and the tracks and clips and all relevant properties and  settings 
 
     Dim curSong As Song, curTrack As Track, curClip As Clip
     Dim isTrack As Boolean, isItem As Boolean, trackCompleted As Boolean
