@@ -194,7 +194,7 @@ Module Read_Reaper_Song
                 Dim data = Split(Trim(SongFile(I + 1)), "FILE ")
                 curClip.FileName = Replace(data(1), Chr(34), "")
 
-                ' If it then it's a short filename use the Reaper root song folder path
+                ' If it's not then it's a short filename use the Reaper root song folder path
                 ' to build a full filename string
                 If InStr(curClip.FileName, ":\") = 0 Then
                     curClip.FileName = curSong.AudioFilePath & "\" & curClip.FileName
@@ -212,7 +212,7 @@ Module Read_Reaper_Song
 
             '***********************************************************************
             ' when you hit the <EXTENSIONS tag you know there are no more tracks
-            ' push the last track object into the song list array and exit the loop
+            ' push the last track object into the child tracks array and exit the loop
             '***********************************************************************
             If InStr(SongFile(I), "<EXTENSIONS") > 0 Then
                 Try
