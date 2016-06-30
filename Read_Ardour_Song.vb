@@ -16,13 +16,8 @@ Module Test_Read_Ardour_Song
         Dim AllClips As New List(Of Clip)
         loadedSong = New Song
 
-        '//////////////////////////////////////////////////////////////////
-        '////    READ THE XML FROM A *.TRACKTIONEDIT TRACKTION 7 XML   ////    
-        '////    FILE TO GET ALL OF THE NECESSARY PARAMETER VALUES     ////
-        '//////////////////////////////////////////////////////////////////
-
         '*****************************************************************
-        '    open a file browser dialog to open a *.tracktionedit file
+        '                  OPRN AN *.AROUR XML SONG FILE
         '*****************************************************************
         Dim f As New OpenFileDialog
         'f.InitialDirectory = Form1.lbl[DAWName]Path.Text
@@ -38,7 +33,7 @@ Module Test_Read_Ardour_Song
         Dim ShortFileName = Replace(f.SafeFileName, ".ardour", "")
 
         '*****************************************************************
-        '          LOAD SONG FILE INTO AN XML DOCUMENT
+        '             LOAD SONG FILE INTO AN XML DOCUMENT
         '*****************************************************************
 
         Dim reader As XmlTextReader = New XmlTextReader(f.FileName)
@@ -93,7 +88,6 @@ Module Test_Read_Ardour_Song
         Dim PoolClipCollection As String = ""
         Dim SourceNodes = songXML.SelectNodes("/Session/Sources/Source")
 
-        '//////////////////////////////////////////////////////////////////////////////////////////////////////
         PoolFiles.Clear()
 
         '  create unique UID's for the pool clips
