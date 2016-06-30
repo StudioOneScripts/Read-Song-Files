@@ -1,13 +1,14 @@
     Module Read_Ardour_File
     
-    Dim PoolFiles As New List(Of Clip)
+   
 
     ' var used to increment numbers when cross checking track names
     ' with the Song.crossCheckTrackNames() Method
-    Public IncrementTrackNames As Integer = 0
-    Public IncrementAudioChNames As Integer = 100
+    'Public IncrementTrackNames As Integer = 0
+    'Public IncrementAudioChNames As Integer = 100
 
     Public Sub Read_Ardour_Song_Data()
+    Dim PoolFiles As New List(Of Clip)
 
         '//////////////////////////////////////////////////////////////////
         '////    READ THE XML FROM A *.TRACKTIONEDIT TRACKTION 7 XML   ////    
@@ -26,7 +27,6 @@
 
         ' if OpenFileDialog is cancelled, exit
         If My.Computer.FileSystem.FileExists(f.FileName) = False Then Exit Sub
-
 
         ' get the short file name for later
         ShortFileName = Replace(f.SafeFileName, ".ardour", "")
