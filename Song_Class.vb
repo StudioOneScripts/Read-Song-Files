@@ -41,7 +41,7 @@ Public Class Song
 
     '*************************************************************************************
     '           A METHOD TO PRINT TO CONSOLE A NICELY FORMATTED OVERVIEW 
-    '               OF THE DATA IN THE LOADEDSONG SONG CLASS INSTANCE
+    '               OF THE DATA IN THE SONG CLASS INSTANCE
     '*************************************************************************************
 
     Public Sub PrintSongData()
@@ -103,9 +103,6 @@ Public Class Song
     Public Function createUID()
         Dim ID = UCase(Guid.NewGuid().ToString)
         Return ID
-
-
-
     End Function
 
     Public Function crossCheckTrackNames(name)
@@ -145,9 +142,8 @@ Public Class Track
 
     Public Sub New()
     End Sub
-
-
 End Class
+                                                                                
 Public Class Clip
     Public Property ParentTrack As String
     Public Property Name As String
@@ -167,12 +163,9 @@ Public Class Clip
     Public Property PoolID As String
     Public Property XMLClipID As String
     Public Property Origin As String ' path?
-
-
     Public Property UseCount As Integer
 
     Public Sub New()
     End Sub
-
 
 End Class
